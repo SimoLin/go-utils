@@ -58,7 +58,7 @@ func MapGetValueToString(M1 map[string]any, key string) (result string) {
 }
 
 // 将任意类型的数组 S1 转为string字符串，间隔符 sep
-func SliceToString(S1 []any, sep string) (result string) {
+func SliceToString[T any](S1 []T, sep string) (result string) {
 	switch len(S1) {
 	case 0:
 		return ""
@@ -75,6 +75,18 @@ func SliceToString(S1 []any, sep string) (result string) {
 		b.WriteString(fmt.Sprintf("%v", s))
 	}
 	return b.String()
+}
+
+func SliceAnyToSliceString(S1 []any) (result []string) {
+	result = []string{}
+	switch len(S1) {
+	case 0:
+		return []string{}
+	}
+	for _, s := range S1 {
+		result = append(result, fmt.Sprintf("%v", s))
+	}
+	return
 }
 
 // 切片去重

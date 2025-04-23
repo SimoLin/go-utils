@@ -53,6 +53,9 @@ func Base64Encode(S1 string) string {
 }
 
 func Base64Decode(S1 string) string {
+	if i := len(S1) % 4; i != 0 {
+		S1 += strings.Repeat("=", 4-i)
+	}
 	decodeBytes, err := base64.StdEncoding.DecodeString(S1)
 	if err != nil {
 		return ""
