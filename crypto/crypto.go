@@ -8,7 +8,11 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/pem"
+	"fmt"
+
+	"github.com/SimoLin/go-utils/hash"
 )
 
 func AESEncryptCBC(origData []byte, key []byte) (encrypted []byte) {
@@ -61,12 +65,53 @@ func RSAEncrypt(plain_text string, pub_key *rsa.PublicKey) (encrypt_text string,
 	if err != nil {
 		return "", err
 	}
+	encrypt_text = string(encryptPKCS1v15)
+	return
+}
+
+func RSAEncryptToHexString(plain_text string, pub_key *rsa.PublicKey) (encrypt_text string, err error) {
+	encryptPKCS1v15, err := rsa.EncryptPKCS1v15(rand.Reader, pub_key, []byte(plain_text))
+	if err != nil {
+		return "", err
+	}
+	encrypt_text = fmt.Sprintf("%x", encryptPKCS1v15)
+	return
+}
+
+func RSAEncryptToBase64String(plain_text string, pub_key *rsa.PublicKey) (encrypt_text string, err error) {
+	encryptPKCS1v15, err := rsa.EncryptPKCS1v15(rand.Reader, pub_key, []byte(plain_text))
+	if err != nil {
+		return "", err
+	}
 	encrypt_text = base64.StdEncoding.EncodeToString(encryptPKCS1v15)
 	return
 }
 
 func RSADecrypt(encrypt_text string, priv_key *rsa.PrivateKey) (plain_text string, err error) {
 	decryptPKCS1v15, err := rsa.DecryptPKCS1v15(rand.Reader, priv_key, []byte(encrypt_text))
+	if err != nil {
+		return "", err
+	}
+	plain_text = string(decryptPKCS1v15)
+	return
+}
+
+func RSADecryptFromBase64String(encrypt_text string, priv_key *rsa.PrivateKey) (plain_text string, err error) {
+	encrypt_text = hash.Base64Decode(encrypt_text)
+	decryptPKCS1v15, err := rsa.DecryptPKCS1v15(rand.Reader, priv_key, []byte(encrypt_text))
+	if err != nil {
+		return "", err
+	}
+	plain_text = string(decryptPKCS1v15)
+	return
+}
+
+func RSADecryptFromHexString(encrypt_text string, priv_key *rsa.PrivateKey) (plain_text string, err error) {
+	encrypt_text_byte, err := hex.DecodeString(encrypt_text)
+	if err != nil {
+		return "", err
+	}
+	decryptPKCS1v15, err := rsa.DecryptPKCS1v15(rand.Reader, priv_key, encrypt_text_byte)
 	if err != nil {
 		return "", err
 	}
