@@ -10,13 +10,36 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// JSON字符串转Map[string]any
 func StringToMap(s string) (M1 map[string]any, err error) {
 	M1 = map[string]any{}
 	err = json.Unmarshal([]byte(s), &M1)
 	return
 }
 
-func MapToString(M1 map[string]any) (r string) {
+// JSON字符串转Map[string]any
+func StringToSliceAny(s string) (S1 []any, err error) {
+	S1 = []any{}
+	err = json.Unmarshal([]byte(s), &S1)
+	return
+}
+
+// JSON字符串转Map[string]any
+func StringToSliceString(s string) (S1 []string, err error) {
+	S1 = []string{}
+	err = json.Unmarshal([]byte(s), &S1)
+	return
+}
+
+// JSON字符串转Map[string]uint
+func StringToSliceUint(s string) (S1 []uint, err error) {
+	S1 = []uint{}
+	err = json.Unmarshal([]byte(s), &S1)
+	return
+}
+
+// 转JSON字符串
+func MapToJsonString(M1 map[string]any) (r string) {
 	result_byte, err := json.Marshal(M1)
 	if err != nil {
 		return
@@ -57,8 +80,17 @@ func MapGetValueToString(M1 map[string]any, key string) (result string) {
 	return fmt.Sprintf("%v", value)
 }
 
+// 转JSON字符串
+func SliceToJsonString(S1 []any) (r string) {
+	result_byte, err := json.Marshal(S1)
+	if err != nil {
+		return
+	}
+	return string(result_byte)
+}
+
 // 将任意类型的数组 S1 转为string字符串，间隔符 sep
-func SliceToString[T any](S1 []T, sep string) (result string) {
+func SliceToJoinString[T any](S1 []T, sep string) (result string) {
 	switch len(S1) {
 	case 0:
 		return ""
@@ -85,6 +117,23 @@ func SliceAnyToSliceString(S1 []any) (result []string) {
 	}
 	for _, s := range S1 {
 		result = append(result, fmt.Sprintf("%v", s))
+	}
+	return
+}
+
+// JSON反序列化获取的[]any，解析的数字格式是float64，转成[]uint
+func SliceAnyToSliceUint(S1 []any) (result []uint) {
+	result = []uint{}
+	switch len(S1) {
+	case 0:
+		return []uint{}
+	}
+	for _, value := range S1 {
+		value_float, ok := value.(float64)
+		if !ok {
+			continue
+		}
+		result = append(result, uint(value_float))
 	}
 	return
 }
