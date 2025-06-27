@@ -13,6 +13,11 @@ func GetNowString() string {
 	return datetime.FormatDate(time.Now())
 }
 
+// 获取 当前时间 简单格式 20060102-150405
+func GetNowStringSimple() string {
+	return datetime.FormatDateWithLayout(time.Now(), "20060102-150405")
+}
+
 // 基于 当前时间 给定 时间间隔 duration，返回时间字符串
 func GetNowStringWithDuration(time_duration_string string) string {
 	now_time := time.Now()
